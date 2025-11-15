@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_eshop
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    volumes:
+      - mongo_data:/data/db
+
+  streamlit_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: streamlit_eshop
+    ports:
+      - "8501:8501"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: mongodb://root:rootpassword@mongodb:27017/
+      # A URI usa o nome do serviço 'mongodb' como hostname, pois estão na mesma rede Docker
+    volumes:
+      - .:/app
+
+volumes:
+  mongo_data:
